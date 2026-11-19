@@ -31,7 +31,7 @@ public final class FactionClientKeys {
     private static void onClientTick(ClientTickEvent.Post event) {
         while (OPEN_MENU.consumeClick()) {
             if (Minecraft.getInstance().getConnection() != null) {
-                PacketDistributor.sendToServer(new FactionNetwork.OpenMenuRequest());
+                PacketDistributor.sendToServer(new FactionNetwork.OpenMenuRequest(0));
             }
         }
     }
