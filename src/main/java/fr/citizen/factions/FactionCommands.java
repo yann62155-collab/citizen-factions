@@ -64,6 +64,35 @@ public final class FactionCommands {
                             context.getSource().sendSuccess(() -> Component.literal(target.getGameProfile().getName() + " a rejoint « " + displayFaction(id) + " »."), true);
                             return 1;
                         }))))
+            .then(Commands.literal("transfer").requires(source -> source.hasPermission(2))
+                .then(Commands.argument("joueur", EntityArgument.player())
+                    .then(Commands.argument("faction", StringArgumentType.word())
+                        .suggests((context, builder) -> net.minecraft.commands.SharedSuggestionProvider.suggest(FACTION_IDS, builder))
+                        .executes(context -> {
+                            ServerPlayer target = EntityArgument.getPlayer(context, "joueur");
+                            String id = normalizeFaction(StringArgumentType.getString(context, "faction"));
+                            if (id == null || !FactionStore.exists(id)) {
+                                context.getSource().sendFailure(Component.literal("Faction inconnue ou non créée."));
+                                return 0;
+                            }
+                            FactionStore.Membership previous = FactionStore.get(target);
+                            if (previous == null) {
+                                context.getSource().sendFailure(Component.literal("Ce joueur n'appartient à aucune faction. Utilise /faction add."));
+                                return 0;
+                            }
+                            if (previous.faction().equals(id)) {
+                                context.getSource().sendFailure(Component.literal("Ce joueur appartient déjà à cette faction."));
+                                return 0;
+                            }
+                            if (!FactionStore.transfer(target, id)) {
+                                context.getSource().sendFailure(Component.literal("Transfert impossible."));
+                                return 0;
+                            }
+                            FactionStore.save(context.getSource().getServer());
+                            target.sendSystemMessage(Component.literal("Tu as été transféré dans « " + displayFaction(id) + " ». Ton grade est conservé : " + displayGrade(previous.grade()) + "."));
+                            context.getSource().sendSuccess(() -> Component.literal(target.getGameProfile().getName() + " a été transféré vers « " + displayFaction(id) + " »."), true);
+                            return 1;
+                        }))))
             .then(Commands.literal("remove").requires(source -> source.hasPermission(2))
                 .then(Commands.argument("joueur", EntityArgument.player()).executes(context -> {
                     ServerPlayer target = EntityArgument.getPlayer(context, "joueur");
