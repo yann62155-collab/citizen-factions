@@ -55,7 +55,10 @@ public final class FactionCommands {
                                 context.getSource().sendFailure(Component.literal("Cette faction n'existe pas. Crée-la avec /faction create."));
                                 return 0;
                             }
-                            FactionStore.add(target, id, "petit");
+                            if (FactionStore.get(target) != null || !FactionStore.add(target, id, "petit")) {
+                                context.getSource().sendFailure(Component.literal("Ce joueur appartient déjà à une faction. Retire-le d'abord avec /faction remove."));
+                                return 0;
+                            }
                             FactionStore.save(context.getSource().getServer());
                             target.sendSystemMessage(Component.literal("Tu as rejoint la faction « " + displayFaction(id) + " » avec le grade Petit."));
                             context.getSource().sendSuccess(() -> Component.literal(target.getGameProfile().getName() + " a rejoint « " + displayFaction(id) + " »."), true);
@@ -102,16 +105,55 @@ public final class FactionCommands {
                 }
                 return 1;
             }))
-            .then(Commands.literal("info").executes(context -> {
-                if (!(context.getSource().getEntity() instanceof ServerPlayer player)) return 0;
-                FactionStore.Membership membership = FactionStore.get(player);
-                if (membership == null) {
-                    player.sendSystemMessage(Component.literal("Tu n'appartiens à aucune faction."));
-                } else {
-                    player.sendSystemMessage(Component.literal("Faction : " + FactionStore.factionName(membership.faction()) + " | Grade : " + displayGrade(membership.grade())));
-                }
-                return 1;
-            }))
+            .then(Commands.literal("info")
+                .executes(context -> {
+                    if (!(context.getSource().getEntity() instanceof ServerPlayer player)) return 0;
+                    FactionStore.Membership membership = FactionStore.get(player);
+                    if (membership == null) {
+                        player.sendSystemMessage(Component.literal("Tu n'appartiens à aucune faction."));
+                    } else {
+                        player.sendSystemMessage(Component.literal("Faction : " + FactionStore.factionName(membership.faction()) + " | Grade : " + displayGrade(membership.grade())));
+                    }
+                    return 1;
+                })
+                .then(Commands.argument("joueur", EntityArgument.player())
+                    .requires(source -> source.hasPermission(2))
+                    .executes(context -> {
+                        ServerPlayer target = EntityArgument.getPlayer(context, "joueur");
+                        FactionStore.Membership membership = FactionStore.get(target);
+                        if (membership == null) {
+                            context.getSource().sendSuccess(() -> Component.literal(target.getGameProfile().getName() + " n'appartient à aucune faction."), false);
+                        } else {
+                            context.getSource().sendSuccess(() -> Component.literal(
+                                target.getGameProfile().getName() + " — " + FactionStore.factionName(membership.faction())
+                                    + " — Grade : " + displayGrade(membership.grade())), false);
+                        }
+                        return 1;
+                    })))
+            .then(Commands.literal("members").requires(source -> source.hasPermission(2))
+                .then(Commands.argument("faction", StringArgumentType.word())
+                    .suggests((context, builder) -> net.minecraft.commands.SharedSuggestionProvider.suggest(FACTION_IDS, builder))
+                    .executes(context -> {
+                        String id = normalizeFaction(StringArgumentType.getString(context, "faction"));
+                        if (id == null || !FactionStore.exists(id)) {
+                            context.getSource().sendFailure(Component.literal("Faction inconnue ou non créée."));
+                            return 0;
+                        }
+                        var members = FactionStore.members(id);
+                        context.getSource().sendSuccess(() -> Component.literal(
+                            "Membres de " + displayFaction(id) + " : " + members.size()), false);
+                        if (members.isEmpty()) {
+                            context.getSource().sendSuccess(() -> Component.literal("Aucun membre."), false);
+                        } else {
+                            members.forEach((uuid, membership) -> {
+                                ServerPlayer online = context.getSource().getServer().getPlayerList().getPlayer(uuid);
+                                String name = online != null ? online.getGameProfile().getName() : uuid.toString();
+                                context.getSource().sendSuccess(() -> Component.literal(
+                                    "• " + name + " — " + displayGrade(membership.grade())), false);
+                            });
+                        }
+                        return 1;
+                    })))
         );
     }
 
