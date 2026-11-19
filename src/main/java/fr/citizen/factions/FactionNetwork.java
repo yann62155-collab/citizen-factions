@@ -37,15 +37,20 @@ public final class FactionNetwork {
         public static final Type<FactionMenuData> TYPE =
             new Type<>(ResourceLocation.fromNamespaceAndPath(CitizenFactions.MOD_ID, "faction_menu"));
         public static final StreamCodec<RegistryFriendlyByteBuf, FactionMenuData> STREAM_CODEC =
-            StreamCodec.composite(
-                ByteBufCodecs.STRING_UTF8, FactionMenuData::faction,
-                ByteBufCodecs.STRING_UTF8, FactionMenuData::grade,
-                ByteBufCodecs.STRING_UTF8, FactionMenuData::roster,
-                ByteBufCodecs.STRING_UTF8, FactionMenuData::bond,
-                ByteBufCodecs.STRING_UTF8, FactionMenuData::status,
-                ByteBufCodecs.VAR_INT, FactionMenuData::page,
-                ByteBufCodecs.VAR_INT, FactionMenuData::totalPages,
-                FactionMenuData::new
+            StreamCodec.of(
+                (buf, data) -> {
+                    buf.writeUtf(data.faction());
+                    buf.writeUtf(data.grade());
+                    buf.writeUtf(data.roster());
+                    buf.writeUtf(data.bond());
+                    buf.writeUtf(data.status());
+                    buf.writeVarInt(data.page());
+                    buf.writeVarInt(data.totalPages());
+                },
+                buf -> new FactionMenuData(
+                    buf.readUtf(), buf.readUtf(), buf.readUtf(), buf.readUtf(), buf.readUtf(),
+                    buf.readVarInt(), buf.readVarInt()
+                )
             );
         @Override public Type<? extends CustomPacketPayload> type() { return TYPE; }
     }
