@@ -70,3 +70,9 @@ Cette branche contient le code source et le workflow de compilation. Le mod doit
 - `/faction menu` ouvre le récapitulatif personnel dans le chat.
 - `/faction info` affiche le même récapitulatif.
 - Le menu indique la faction, le grade, l'effectif, les membres (connectés / hors ligne) et le niveau de lien avec le dragon actuellement monté.
+
+## Interface graphique joueur
+- Appuie sur **K** pour ouvrir le menu des factions.
+- `/faction menu` et `/faction info` ouvrent également la fenêtre.
+- Le menu affiche la faction, le grade, l'effectif, les membres connectés / hors ligne et le lien avec le dragon monté.
+- Le bouton **Actualiser** récupère les données les plus récentes du serveur.
