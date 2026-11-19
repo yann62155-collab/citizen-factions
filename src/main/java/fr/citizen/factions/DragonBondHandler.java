@@ -28,8 +28,9 @@ public final class DragonBondHandler {
     private DragonBondHandler() {}
 
     public static void onMount(EntityMountEvent event) {
-        if (!(event.getEntity() instanceof ServerPlayer player) || !isDragon(event.getMount())) return;
-        Entity dragon = event.getMount();
+        if (!(event.getEntity() instanceof ServerPlayer player)) return;
+        Entity dragon = event.getEntityBeingMounted();
+        if (!isDragon(dragon)) return;
         if (event.isMounting()) {
             FactionStore.Membership member = FactionStore.get(player);
             if (member == null || !isAllowed(member.faction(), dragon)) {
@@ -94,11 +95,15 @@ public final class DragonBondHandler {
         long lastActive = entry.getLong("last_active");
         long now = dragon.level().getGameTime();
         if (lastActive > 0L && now > lastActive) {
-            int loss = (int) ((now - lastActive) / DECAY_INTERVAL);
-            if (loss > 0) entry.putInt("bond", Math.max(0, entry.getInt("bond") - loss));
+            long elapsed = now - lastActive;
+            int loss = (int) (elapsed / DECAY_INTERVAL);
+            if (loss > 0) {
+                entry.putInt("bond", Math.max(0, entry.getInt("bond") - loss));
+                lastActive += (long) loss * DECAY_INTERVAL;
+            }
         }
         entry.putLong("last_gain", now);
-        entry.putLong("last_active", now);
+        entry.putLong("last_active", lastActive > 0L ? lastActive : now);
         putEntry(dragon, player.getUUID(), entry);
     }
 
