@@ -109,6 +109,13 @@ public final class FactionStore {
         return Map.copyOf(result);
     }
 
+    public static synchronized boolean transfer(ServerPlayer player, String faction) {
+        Membership old = MEMBERS.get(player.getUUID());
+        if (old == null || !FACTIONS.containsKey(faction)) return false;
+        MEMBERS.put(player.getUUID(), new Membership(faction, old.grade()));
+        return true;
+    }
+
     public static synchronized boolean remove(Player player) { return MEMBERS.remove(player.getUUID()) != null; }
 
     public static synchronized boolean setGrade(Player player, String grade) {
