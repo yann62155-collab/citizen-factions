@@ -134,15 +134,15 @@ public final class FactionCommands {
                 }
                 return 1;
             }))
+            .then(Commands.literal("menu").executes(context -> {
+                if (!(context.getSource().getEntity() instanceof ServerPlayer player)) return 0;
+                showPlayerMenu(player);
+                return 1;
+            }))
             .then(Commands.literal("info")
                 .executes(context -> {
                     if (!(context.getSource().getEntity() instanceof ServerPlayer player)) return 0;
-                    FactionStore.Membership membership = FactionStore.get(player);
-                    if (membership == null) {
-                        player.sendSystemMessage(Component.literal("Tu n'appartiens à aucune faction."));
-                    } else {
-                        player.sendSystemMessage(Component.literal("Faction : " + FactionStore.factionName(membership.faction()) + " | Grade : " + displayGrade(membership.grade())));
-                    }
+                    showPlayerMenu(player);
                     return 1;
                 })
                 .then(Commands.argument("joueur", EntityArgument.player())
@@ -184,6 +184,38 @@ public final class FactionCommands {
                         return 1;
                     })))
         );
+    }
+
+    private static void showPlayerMenu(ServerPlayer player) {
+        player.sendSystemMessage(Component.literal("━━━━━━━━━━ CITIZEN • FACTIONS ━━━━━━━━━━"));
+        FactionStore.Membership membership = FactionStore.get(player);
+        if (membership == null) {
+            player.sendSystemMessage(Component.literal("Statut : Sans faction"));
+            player.sendSystemMessage(Component.literal("Contacte un administrateur pour rejoindre les Dragonniers ou les Chasseurs de dragons."));
+        } else {
+            String faction = FactionStore.factionName(membership.faction());
+            player.sendSystemMessage(Component.literal("Faction : " + faction));
+            player.sendSystemMessage(Component.literal("Grade : " + displayGrade(membership.grade())));
+            var members = FactionStore.members(membership.faction());
+            long online = members.keySet().stream()
+                .filter(id -> player.getServer().getPlayerList().getPlayer(id) != null).count();
+            player.sendSystemMessage(Component.literal("Effectif : " + members.size() + " membre(s), dont " + online + " connecté(s)"));
+            player.sendSystemMessage(Component.literal("── Membres ──"));
+            members.forEach((uuid, data) -> {
+                ServerPlayer onlinePlayer = player.getServer().getPlayerList().getPlayer(uuid);
+                String name = onlinePlayer != null ? onlinePlayer.getGameProfile().getName() : player.getServer().getProfileCache()
+                    .get(uuid).map(profile -> profile.getName()).orElse("Joueur inconnu");
+                player.sendSystemMessage(Component.literal((onlinePlayer != null ? "● " : "○ ") + name
+                    + " — " + displayGrade(data.grade())));
+            });
+        }
+        int bond = DragonBondHandler.getCurrentRidingBond(player);
+        player.sendSystemMessage(Component.literal("── Lien draconique ──"));
+        player.sendSystemMessage(Component.literal(bond >= 0
+            ? "Lien avec ta monture actuelle : " + bond + "%."
+            : "Aucun dragon monté actuellement. Le lien progresse pendant que tu montes ton dragon."));
+        player.sendSystemMessage(Component.literal("Commandes : /faction menu • /faction info"));
+        player.sendSystemMessage(Component.literal("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"));
     }
 
     private static String normalizeFaction(String raw) {
