@@ -76,3 +76,8 @@ Cette branche contient le code source et le workflow de compilation. Le mod doit
 - `/faction menu` et `/faction info` ouvrent également la fenêtre.
 - Le menu affiche la faction, le grade, l'effectif, les membres connectés / hors ligne et le lien avec le dragon monté.
 - Le bouton **Actualiser** récupère les données les plus récentes du serveur.
+
+## Navigation de l'effectif
+- La liste des membres est maintenant paginée par le serveur, huit joueurs par page.
+- Les boutons précédent / suivant permettent de parcourir tous les membres sans tronquer la liste.
+- Le bouton Actualiser recharge la page affichée.
