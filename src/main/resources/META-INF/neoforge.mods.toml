@@ -1,0 +1,38 @@
+modLoader="javafml"
+loaderVersion="[4,)"
+license="All Rights Reserved"
+
+[[mods]]
+modId="citizenfactions"
+version="1.0.1"
+displayName="CITIZEN Factions"
+authors="CITIZEN"
+description='''Factions, grades and dragon bond mechanics for the CITIZEN server.'''
+
+[[dependencies.citizenfactions]]
+modId="neoforge"
+type="required"
+versionRange="[21.1.215,)"
+ordering="NONE"
+side="BOTH"
+
+[[dependencies.citizenfactions]]
+modId="minecraft"
+type="required"
+versionRange="[1.21.1]"
+ordering="NONE"
+side="BOTH"
+
+[[dependencies.citizenfactions]]
+modId="iceandfire"
+type="required"
+versionRange="[2.1.13-beta.10,)"
+ordering="AFTER"
+side="BOTH"
+
+[[dependencies.citizenfactions]]
+modId="rampart"
+type="required"
+versionRange="[1.1.0,)"
+ordering="AFTER"
+side="BOTH"
