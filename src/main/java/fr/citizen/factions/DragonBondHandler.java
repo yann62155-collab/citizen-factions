@@ -140,10 +140,13 @@ public final class DragonBondHandler {
 
     private static boolean isAllowed(String faction, Entity dragon) {
         String variant = getVariantName(dragon).toLowerCase(java.util.Locale.ROOT);
-        boolean corrupted = variant.contains("black") || variant.contains("gray")
+        if (variant.isBlank()) return false;
+
+        boolean restrictedVariant = variant.contains("black") || variant.contains("gray")
             || variant.contains("grey") || variant.contains("copper");
-        if (faction.equals("chasseur_de_dragon")) return corrupted;
-        if (faction.equals("dragonnier")) return !corrupted;
+
+        if (faction.equals("chasseur_de_dragon")) return restrictedVariant;
+        if (faction.equals("dragonnier")) return !restrictedVariant;
         return false;
     }
 
