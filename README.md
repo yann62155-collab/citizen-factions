@@ -9,7 +9,9 @@ Système de factions et de lien avec les dragons pour le serveur CITIZEN.
 - **Dragonnier** : peut monter les dragons non corrompus.
 - **Chasseur de dragon** : peut monter les dragons noirs, gris et cuivrés.
 - Grades administrables : **Primodiau**, **Alpha**, **Confirmé**, **Petit**.
-- Seuls les opérateurs niveau 2 peuvent créer les factions, ajouter/retirer des joueurs et modifier les grades.
+- Seuls les opérateurs niveau 2 peuvent créer les factions, ajouter/retirer/transférer des joueurs, consulter les listes et modifier les grades.
+- Un joueur ne peut appartenir qu'à une seule faction à la fois.
+- Le transfert conserve le grade du joueur.
 
 ## Lien avec le dragon
 
@@ -27,10 +29,13 @@ Toutes les commandes de gestion exigent le niveau opérateur 2.
 /faction create dragonnier
 /faction create chasseur_de_dragon
 /faction add <joueur> <dragonnier|chasseur_de_dragon>
+/faction transfer <joueur> <dragonnier|chasseur_de_dragon>
 /faction remove <joueur>
 /faction grade <joueur> <primodiau|alpha|confirme|petit>
 /faction list
 /faction info
+/faction info <joueur>
+/faction members <dragonnier|chasseur_de_dragon>
 ```
 
 Les factions doivent être créées avant d'y ajouter des joueurs.
