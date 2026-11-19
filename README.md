@@ -64,3 +64,9 @@ Le fichier compilé se trouve dans `build/libs/`.
 ## État
 
 Cette branche contient le code source et le workflow de compilation. Le mod doit encore être compilé avec le workflow GitHub Actions puis testé sur un serveur de test NeoForge avant installation sur le serveur CITIZEN de production.
+
+
+## Menu joueur
+- `/faction menu` ouvre le récapitulatif personnel dans le chat.
+- `/faction info` affiche le même récapitulatif.
+- Le menu indique la faction, le grade, l'effectif, les membres (connectés / hors ligne) et le niveau de lien avec le dragon actuellement monté.
