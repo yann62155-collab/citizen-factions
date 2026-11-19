@@ -83,6 +83,11 @@ public final class DragonBondHandler {
         applyResistance(dragon, serverPlayer, bond, now);
     }
 
+    public static int getCurrentRidingBond(ServerPlayer player) {
+        Entity dragon = player.getVehicle();
+        return isDragon(dragon) ? getBond(player, dragon) : -1;
+    }
+
     private static void applyResistance(Entity dragon, ServerPlayer rider, int bond, long now) {
         if (bond < 75 && now % 40L == 0L && getControllingPassenger(dragon) == rider) {
             float strength = (75 - bond) * 0.012F;
