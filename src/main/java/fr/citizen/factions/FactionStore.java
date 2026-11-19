@@ -95,9 +95,18 @@ public final class FactionStore {
     public static synchronized Membership get(Player player) { return MEMBERS.get(player.getUUID()); }
 
     public static synchronized boolean add(ServerPlayer player, String faction, String grade) {
-        if (!FACTIONS.containsKey(faction) || !FactionCommands.isValidGrade(grade)) return false;
+        if (!FACTIONS.containsKey(faction) || !FactionCommands.isValidGrade(grade)
+                || MEMBERS.containsKey(player.getUUID())) return false;
         MEMBERS.put(player.getUUID(), new Membership(faction, grade));
         return true;
+    }
+
+    public static synchronized Map<UUID, Membership> members(String faction) {
+        Map<UUID, Membership> result = new HashMap<>();
+        MEMBERS.forEach((id, membership) -> {
+            if (membership.faction().equals(faction)) result.put(id, membership);
+        });
+        return Map.copyOf(result);
     }
 
     public static synchronized boolean remove(Player player) { return MEMBERS.remove(player.getUUID()) != null; }
